@@ -1,0 +1,10 @@
+Package: com.wizages.bab
+Name: BringTheAppleBack
+Depends: mobilesubstrate
+Version: 1.0~beta1
+Architecture: iphoneos-arm
+Description: On resprings it brings back the apple logo instead of the spinner or black screen.
+Maintainer: wizage
+Author: wizage
+Section: Tweaks
+Depiction: http://wizages.com/cydia/depictions/?dep=com.wizages.bab
