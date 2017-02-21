@@ -54,6 +54,7 @@ PUIProgressWindow *window;
 }
 
 CFDataRef shutDown(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info) {
+    [window _createLayer];
 	[window setVisible:NO];
     return NULL;
 }

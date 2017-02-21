@@ -1,9 +1,9 @@
-Package: com.wizages.bab
-Name: BringTheAppleBack
+Package: com.wizages.bae
+Name: MakeRespringsGreatAgain
 Depends: mobilesubstrate
-Version: 1.0~beta1
+Version: 1.0
 Architecture: iphoneos-arm
-Description: On resprings it brings back the apple logo instead of the spinner or black screen.
+Description: On resprings it brings back the apple logo which makes resprings great again!
 Maintainer: wizage
 Author: wizage
 Section: Tweaks
