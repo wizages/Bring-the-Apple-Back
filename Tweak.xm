@@ -8,6 +8,7 @@
 @end
 
 CFDataRef shutDown(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info);
+CFDataRef startUp(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info);
 
 PUIProgressWindow *window;
 
@@ -31,7 +32,6 @@ PUIProgressWindow *window;
         window = [[PUIProgressWindow alloc] initWithProgressBarVisibility:NO createContext:YES contextLevel:1000 appearance:0];
         [window _createLayer];
         [window setVisible:YES];
-        //[window _createLayer];
     }
     return %orig(arg1, -1);
 }
@@ -47,16 +47,35 @@ PUIProgressWindow *window;
 - (id)initWithProgressBarVisibility:(BOOL)arg1 createContext:(BOOL)arg2 contextLevel:(float)arg3 appearance:(int)arg4 {
 
     
-    CFMessagePortRef port = CFMessagePortCreateLocal(kCFAllocatorDefault, CFSTR("com.wizages.bab"), &shutDown, NULL, NULL);
+    CFMessagePortRef port = CFMessagePortCreateLocal(kCFAllocatorDefault, CFSTR("com.wizages.babEnd"), &shutDown, NULL, NULL);
     CFMessagePortSetDispatchQueue(port, dispatch_get_main_queue());
+    CFMessagePortRef port2 = CFMessagePortCreateLocal(kCFAllocatorDefault, CFSTR("com.wizages.babStart"), &startUp, NULL, NULL);
+    CFMessagePortSetDispatchQueue(port2, dispatch_get_main_queue());
     window = %orig(arg1, arg2, arg3, arg4);
     return window;
 }
 
 CFDataRef shutDown(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info) {
-    [window _createLayer];
+    //[window _createLayer];
 	[window setVisible:NO];
+    HBLogDebug(@"Hide");
     return NULL;
+}
+
+CFDataRef startUp(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info) {
+    [window _createLayer];
+    [window setVisible:YES];
+    HBLogDebug(@"Show");
+    return NULL;
+}
+
+-(void)setVisible:(BOOL)arg1{
+    %orig;
+    if(arg1){
+        HBLogDebug(@"Show");
+    } else {
+        HBLogDebug(@"Hide");
+    }
 }
 
 %end
@@ -68,7 +87,7 @@ CFDataRef shutDown(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *i
 	%orig;
 
 	int32_t local = 0;
-    CFMessagePortRef port = CFMessagePortCreateRemote(kCFAllocatorDefault, CFSTR("com.wizages.bab"));
+    CFMessagePortRef port = CFMessagePortCreateRemote(kCFAllocatorDefault, CFSTR("com.wizages.babEnd"));
     int progressPointer = local;
     NSData *progressMessage = [NSData dataWithBytes:&local length:sizeof(progressPointer)];
     if (port > 0) {
