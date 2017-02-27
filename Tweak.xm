@@ -56,8 +56,9 @@ PUIProgressWindow *window;
 }
 
 CFDataRef shutDown(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info) {
-    //[window _createLayer];
+    //
 	[window setVisible:NO];
+    [window _createLayer];
     HBLogDebug(@"Hide");
     return NULL;
 }
@@ -84,12 +85,20 @@ CFDataRef startUp(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *in
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
 
-	%orig;
-
-	int32_t local = 0;
-    CFMessagePortRef port = CFMessagePortCreateRemote(kCFAllocatorDefault, CFSTR("com.wizages.babEnd"));
+    int32_t local = 0;
     int progressPointer = local;
     NSData *progressMessage = [NSData dataWithBytes:&local length:sizeof(progressPointer)];
+
+    CFMessagePortRef port2 = CFMessagePortCreateRemote(kCFAllocatorDefault, CFSTR("com.wizages.babStart"));
+    
+    if (port2 > 0) {
+        CFMessagePortSendRequest(port2, 0, (CFDataRef)progressMessage, 1000, 0, NULL, NULL);
+    }
+
+	%orig;
+
+    CFMessagePortRef port = CFMessagePortCreateRemote(kCFAllocatorDefault, CFSTR("com.wizages.babEnd"));
+    
     if (port > 0) {
         CFMessagePortSendRequest(port, 0, (CFDataRef)progressMessage, 1000, 0, NULL, NULL);
     }
