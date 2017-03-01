@@ -1,7 +1,7 @@
 Package: com.wizages.bae
 Name: MakeRespringsGreatAgain
 Depends: mobilesubstrate
-Version: 1.2
+Version: 1.3
 Architecture: iphoneos-arm
 Description: On resprings it brings back the apple logo which makes resprings great again!
 Maintainer: wizage

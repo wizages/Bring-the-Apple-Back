@@ -1,10 +1,19 @@
 #import <objc/runtime.h>
+#import "header.h"
 
 @interface PUIProgressWindow : NSObject
 - (void)setProgressValue:(float)arg1;
 - (void)_createLayer;
 - (void)setVisible:(BOOL)arg1;
 -(id)initWithProgressBarVisibility:(BOOL)arg1 createContext:(BOOL)arg2 contextLevel:(float)arg3 appearance:(int)arg4;
+@end
+
+@interface SBBacklightController: NSObject
++ (id)sharedInstance;
++ (id)_sharedInstanceCreateIfNeeded:(BOOL)arg1 ;
++ (id)sharedInstanceIfExists;
+- (void)startFadeOutAnimationFromLockSource:(int)arg1 ;
+- (void)animateBacklightToFactor:(float)arg1 duration:(double)arg2 source:(long long)arg3 completion:(void (^)(void))arg4 ;
 @end
 
 CFDataRef shutDown(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *info);
@@ -24,15 +33,28 @@ PUIProgressWindow *window;
 
 %end
 
+%hook BKDisplayRenderOverlay 
+
+-(void)freeze{
+    //Fuck you freezer!
+
+    //%orig;
+}
+
+%end
+
 %hook BKDisplayRenderOverlaySpinny
 
 -(id)initWithOverlayDescriptor:(id)arg1 level:(float)arg2{
+
     if (window == nil && arg2 > -1)
     {
         window = [[PUIProgressWindow alloc] initWithProgressBarVisibility:NO createContext:YES contextLevel:1000 appearance:0];
         [window _createLayer];
         [window setVisible:YES];
     }
+    
+
     return %orig(arg1, -1);
 }
 
@@ -52,6 +74,7 @@ PUIProgressWindow *window;
     CFMessagePortRef port2 = CFMessagePortCreateLocal(kCFAllocatorDefault, CFSTR("com.wizages.babStart"), &startUp, NULL, NULL);
     CFMessagePortSetDispatchQueue(port2, dispatch_get_main_queue());
     window = %orig(arg1, arg2, arg3, arg4);
+    
     return window;
 }
 
@@ -84,6 +107,9 @@ CFDataRef startUp(CFMessagePortRef local, SInt32 msgid, CFDataRef data, void *in
 %hook SpringBoard
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+    BKSHIDServicesSetBacklightFactorWithFadeDuration(1.0, 0, false);
+    BKSDisplayServicesSetScreenBlanked(NO);
 
     int32_t local = 0;
     int progressPointer = local;
